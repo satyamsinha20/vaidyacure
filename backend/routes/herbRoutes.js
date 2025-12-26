@@ -1,34 +1,45 @@
 const express = require("express");
 const Herb = require("../models/Herb");
 const multer = require("multer");
-const cloudinary = require("../config/cloudinary"); // Cloudinary config
+const cloudinary = require("../config/cloudinary");
+
 const router = express.Router();
 
-// Multer setup to store file in memory
+// Multer setup
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
+
+// 🔥 helper to normalize comma-separated fields
+const normalizeArray = (value = "") =>
+  value
+    .split(",")
+    .map(v => v.trim().toLowerCase())
+    .filter(Boolean);
 
 // ----------------- POST: Add Herb -----------------
 router.post("/", upload.single("image"), async (req, res) => {
   try {
     let imageUrl = "";
 
-    // Upload image to Cloudinary if file exists
     if (req.file) {
       const result = await cloudinary.uploader.upload(
         `data:image/jpeg;base64,${req.file.buffer.toString("base64")}`,
-        { folder: "VaidyaCure/herbs" } // ✅ nested folder
+        { folder: "VaidyaCure/herbs" }
       );
       imageUrl = result.secure_url;
     }
 
     const herb = new Herb({
-      ...req.body,
-      benefit: req.body.benefit.split(","),
-      sideEffect: req.body.sideEffect?.split(",") || [],
-      health: req.body.health?.split(",") || [],
-      symptoms: req.body.symptoms.split(","),
-      process: req.body.process.split("\n"),
+      name: req.body.name,
+      description: req.body.description,
+      benefit: normalizeArray(req.body.benefit),
+      sideEffect: normalizeArray(req.body.sideEffect),
+      health: normalizeArray(req.body.health),
+      symptoms: normalizeArray(req.body.symptoms),
+      process: req.body.process
+        .split("\n")
+        .map(p => p.trim())
+        .filter(Boolean),
       imageUrl,
     });
 
@@ -40,14 +51,16 @@ router.post("/", upload.single("image"), async (req, res) => {
   }
 });
 
-// ----------------- GET: List Herbs -----------------
+// ----------------- GET: List Herbs (with filter) -----------------
 router.get("/", async (req, res) => {
   try {
     const { symptom } = req.query;
 
     let herbs;
     if (symptom && symptom !== "all") {
-      herbs = await Herb.find({ symptoms: symptom });
+      herbs = await Herb.find({
+        symptoms: { $in: [symptom.toLowerCase()] },
+      });
     } else {
       herbs = await Herb.find();
     }
@@ -66,7 +79,7 @@ router.put("/:id", upload.single("image"), async (req, res) => {
     if (req.file) {
       const result = await cloudinary.uploader.upload(
         `data:image/jpeg;base64,${req.file.buffer.toString("base64")}`,
-        { folder: "VaidyaCure/herbs" } // ✅ nested folder
+        { folder: "VaidyaCure/herbs" }
       );
       imageUrl = result.secure_url;
     }
@@ -74,12 +87,16 @@ router.put("/:id", upload.single("image"), async (req, res) => {
     const updatedHerb = await Herb.findByIdAndUpdate(
       req.params.id,
       {
-        ...req.body,
-        benefit: req.body.benefit.split(","),
-        sideEffect: req.body.sideEffect?.split(",") || [],
-        health: req.body.health?.split(",") || [],
-        symptoms: req.body.symptoms.split(","),
-        process: req.body.process.split("\n"),
+        name: req.body.name,
+        description: req.body.description,
+        benefit: normalizeArray(req.body.benefit),
+        sideEffect: normalizeArray(req.body.sideEffect),
+        health: normalizeArray(req.body.health),
+        symptoms: normalizeArray(req.body.symptoms),
+        process: req.body.process
+          .split("\n")
+          .map(p => p.trim())
+          .filter(Boolean),
         imageUrl,
       },
       { new: true }
