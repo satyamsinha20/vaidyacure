@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
+import api from "../api/axios";
 import AddHerb from "./AddHerb";
 
 export default function Herbs() {
-  const navigate = useNavigate(); // ✅ Moved inside the component
+  const navigate = useNavigate();
 
   const [herbs, setHerbs] = useState([]);
   const [editData, setEditData] = useState(null);
@@ -12,11 +12,10 @@ export default function Herbs() {
 
   const load = async () => {
     try {
-      const res = await axios.get("http://172.20.10.10:5000/api/herbs");
-      console.log(res.data);
+      const res = await api.get("/herbs");
       setHerbs(res.data);
-    } catch (error) {
-      console.error("Failed to load herbs:", error);
+    } catch (err) {
+      console.error("Failed to load herbs", err);
     }
   };
 
@@ -27,10 +26,10 @@ export default function Herbs() {
   const del = async (id) => {
     if (!window.confirm("Delete herb?")) return;
     try {
-      await axios.delete(`http://172.20.10.10:5000/api/herbs/${id}`);
+      await api.delete(`/herbs/${id}`);
       load();
-    } catch (error) {
-      console.error("Failed to delete herb:", error);
+    } catch (err) {
+      console.error("Delete failed", err);
     }
   };
 
@@ -50,23 +49,22 @@ export default function Herbs() {
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-100 p-6">
       <div className="max-w-7xl mx-auto space-y-10">
 
-        {/* Add New Herb Button */}
         <div className="flex justify-end space-x-2">
           <button
             onClick={handleAddNew}
-            className="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition"
+            className="bg-green-600 text-white px-6 py-2 rounded-lg"
           >
             + Add New Herb
           </button>
+
           <button
-            className="bg-gray-600 text-white px-6 py-2 rounded-lg hover:bg-gray-700 transition"
             onClick={() => navigate("/dashboard")}
+            className="bg-gray-600 text-white px-6 py-2 rounded-lg"
           >
             Back To Dashboard
           </button>
         </div>
 
-        {/* Add / Edit Herb Form */}
         {showForm && (
           <div className="bg-white rounded-2xl shadow-lg p-6">
             <AddHerb
@@ -81,61 +79,53 @@ export default function Herbs() {
           </div>
         )}
 
-        {/* Herbs Table */}
         <div className="bg-white rounded-2xl shadow-lg overflow-hidden">
           <div className="p-6 border-b">
-            <h2 className="text-2xl font-bold text-green-700">🌿 Herbs Management</h2>
-            <p className="text-sm text-gray-500">Manage all herbal records here</p>
+            <h2 className="text-2xl font-bold text-green-700">
+              🌿 Herbs Management
+            </h2>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="bg-green-600 text-white">
-                <tr>
-                  <th className="p-4 text-left">Herb Name</th>
-                  <th className="p-4 text-left">Symptoms</th>
-                  <th className="p-4 text-center">Actions</th>
+          <table className="w-full text-sm">
+            <thead className="bg-green-600 text-white">
+              <tr>
+                <th className="p-4 text-left">Herb</th>
+                <th className="p-4 text-left">Symptoms</th>
+                <th className="p-4 text-center">Actions</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              {herbs.map((h) => (
+                <tr key={h._id} className="border-b">
+                  <td className="p-4">{h.name}</td>
+                  <td className="p-4">{h.symptoms.join(", ")}</td>
+                  <td className="p-4 text-center space-x-2">
+                    <button
+                      onClick={() => handleEdit(h)}
+                      className="bg-blue-500 text-white px-3 py-1 rounded"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      onClick={() => del(h._id)}
+                      className="bg-red-500 text-white px-3 py-1 rounded"
+                    >
+                      Delete
+                    </button>
+                  </td>
                 </tr>
-              </thead>
+              ))}
 
-              <tbody>
-                {herbs.length === 0 && (
-                  <tr>
-                    <td colSpan="3" className="text-center py-10 text-gray-400">
-                      No herbs found 🌱
-                    </td>
-                  </tr>
-                )}
-
-                {herbs.map((h, index) => (
-                  <tr
-                    key={h._id}
-                    className={`border-b hover:bg-green-50 transition ${
-                      index % 2 === 0 ? "bg-white" : "bg-gray-50"
-                    }`}
-                  >
-                    <td className="p-4 font-medium text-gray-800">{h.name}</td>
-                    <td className="p-4 text-gray-600">{h.symptoms.join(", ")}</td>
-                    <td className="p-4 text-center space-x-2">
-                      <button
-                        onClick={() => handleEdit(h)}
-                        className="px-4 py-1.5 rounded-full bg-blue-500 text-white text-xs font-semibold hover:bg-blue-600 transition"
-                      >
-                        ✏ Edit
-                      </button>
-
-                      <button
-                        onClick={() => del(h._id)}
-                        className="px-4 py-1.5 rounded-full bg-red-500 text-white text-xs font-semibold hover:bg-red-600 transition"
-                      >
-                        🗑 Delete
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+              {herbs.length === 0 && (
+                <tr>
+                  <td colSpan="3" className="text-center p-6 text-gray-400">
+                    No herbs found 🌱
+                  </td>
+                </tr>
+              )}
+            </tbody>
+          </table>
         </div>
 
       </div>

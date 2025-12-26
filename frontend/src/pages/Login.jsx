@@ -1,5 +1,5 @@
 import { useState } from "react";
-import axios from "axios";
+import api from "../api/axios";
 
 export default function Login({ setUser }) {
   const [form, setForm] = useState({
@@ -12,15 +12,15 @@ export default function Login({ setUser }) {
 
   const submitHandler = async () => {
     try {
-      const res = await axios.post(
-        "http://172.20.10.10:5000/api/auth/login",
-        form
-      );
+      const res = await api.post("/auth/login", form);
 
       localStorage.setItem("token", res.data.token);
       localStorage.setItem("name", res.data.name);
+
       setUser(res.data.name);
+      setError("");
     } catch (err) {
+      console.error(err);
       setError("Invalid login details");
     }
   };
@@ -32,6 +32,7 @@ export default function Login({ setUser }) {
       <input
         style={styles.input}
         placeholder="Email Address"
+        value={form.email}
         onChange={(e) =>
           setForm({ ...form, email: e.target.value })
         }
@@ -41,6 +42,7 @@ export default function Login({ setUser }) {
         style={styles.input}
         type="password"
         placeholder="Password"
+        value={form.password}
         onChange={(e) =>
           setForm({ ...form, password: e.target.value })
         }
@@ -49,6 +51,7 @@ export default function Login({ setUser }) {
       <input
         style={styles.input}
         placeholder="User Pin"
+        value={form.userPin}
         onChange={(e) =>
           setForm({ ...form, userPin: e.target.value })
         }
