@@ -52,11 +52,7 @@ export default function AddHerb({ refresh, editData, setEditData, setShowForm })
       const formData = new FormData();
 
       Object.keys(form).forEach((key) => {
-        if (
-          key !== "imageFile" &&
-          key !== "imageUrl" &&
-          form[key]
-        ) {
+        if (key !== "imageFile" && key !== "imageUrl" && form[key]) {
           formData.append(key, form[key]);
         }
       });
@@ -99,60 +95,90 @@ export default function AddHerb({ refresh, editData, setEditData, setShowForm })
       </h2>
 
       <form onSubmit={submit} className="space-y-4">
-        <input
-          className="w-full border rounded-lg p-2"
-          placeholder="Herb Name"
-          value={form.name}
-          onChange={(e) => setForm({ ...form, name: e.target.value })}
-          required
-        />
 
-        <textarea
-          className="w-full border rounded-lg p-2 h-24"
-          placeholder="Description"
-          value={form.description}
-          onChange={(e) => setForm({ ...form, description: e.target.value })}
-          required
-        />
+        <div>
+          <label className="block text-sm font-semibold mb-1">Herb Name</label>
+          <input
+            className="w-full border rounded-lg p-2"
+            placeholder="Enter herb name"
+            value={form.name}
+            onChange={(e) => setForm({ ...form, name: e.target.value })}
+            required
+          />
+        </div>
 
-        <input
-          className="w-full border rounded-lg p-2"
-          placeholder="Benefits (comma separated)"
-          value={form.benefit}
-          onChange={(e) => setForm({ ...form, benefit: e.target.value })}
-        />
+        <div>
+          <label className="block text-sm font-semibold mb-1">Description</label>
+          <textarea
+            className="w-full border rounded-lg p-2 h-24"
+            placeholder="Enter description"
+            value={form.description}
+            onChange={(e) => setForm({ ...form, description: e.target.value })}
+            required
+          />
+        </div>
 
-        <input
-          className="w-full border rounded-lg p-2"
-          placeholder="Side Effects"
-          value={form.sideEffect}
-          onChange={(e) => setForm({ ...form, sideEffect: e.target.value })}
-        />
+        <div>
+          <label className="block text-sm font-semibold mb-1">
+            Benefits (comma separated)
+          </label>
+          <input
+            className="w-full border rounded-lg p-2"
+            placeholder="Digestion, Immunity"
+            value={form.benefit}
+            onChange={(e) => setForm({ ...form, benefit: e.target.value })}
+          />
+        </div>
 
-        <input
-          className="w-full border rounded-lg p-2"
-          placeholder="Health"
-          value={form.health}
-          onChange={(e) => setForm({ ...form, health: e.target.value })}
-        />
+        <div>
+          <label className="block text-sm font-semibold mb-1">Side Effects</label>
+          <input
+            className="w-full border rounded-lg p-2"
+            placeholder="Nausea, Allergy"
+            value={form.sideEffect}
+            onChange={(e) => setForm({ ...form, sideEffect: e.target.value })}
+          />
+        </div>
 
-        <input
-          className="w-full border rounded-lg p-2"
-          placeholder="Symptoms"
-          value={form.symptoms}
-          onChange={(e) => setForm({ ...form, symptoms: e.target.value })}
-        />
+        <div>
+          <label className="block text-sm font-semibold mb-1">
+            Health Category
+          </label>
+          <input
+            className="w-full border rounded-lg p-2"
+            placeholder="Digestive, Skin"
+            value={form.health}
+            onChange={(e) => setForm({ ...form, health: e.target.value })}
+          />
+        </div>
 
-        <textarea
-          className="w-full border rounded-lg p-2 h-24"
-          placeholder="Process (each step new line)"
-          value={form.process}
-          onChange={(e) => setForm({ ...form, process: e.target.value })}
-        />
+        <div>
+          <label className="block text-sm font-semibold mb-1">Symptoms</label>
+          <input
+            className="w-full border rounded-lg p-2"
+            placeholder="Cough, Fever"
+            value={form.symptoms}
+            onChange={(e) => setForm({ ...form, symptoms: e.target.value })}
+          />
+        </div>
+
+        <div>
+          <label className="block text-sm font-semibold mb-1">
+            Preparation / Usage Process
+          </label>
+          <textarea
+            className="w-full border rounded-lg p-2 h-24"
+            placeholder="Each step on new line"
+            value={form.process}
+            onChange={(e) => setForm({ ...form, process: e.target.value })}
+          />
+        </div>
 
         {form.imageUrl && !form.imageFile && (
           <div>
-            <p className="text-sm text-gray-500">Current Image:</p>
+            <label className="block text-sm font-semibold mb-1">
+              Current Image
+            </label>
             <img
               src={form.imageUrl}
               alt="Herb"
@@ -161,17 +187,22 @@ export default function AddHerb({ refresh, editData, setEditData, setShowForm })
           </div>
         )}
 
-        <input
-          type="file"
-          accept="image/*"
-          onChange={(e) =>
-            setForm({
-              ...form,
-              imageFile: e.target.files[0],
-              imageUrl: "",
-            })
-          }
-        />
+        <div>
+          <label className="block text-sm font-semibold mb-1">
+            Upload Image
+          </label>
+          <input
+            type="file"
+            accept="image/*"
+            onChange={(e) =>
+              setForm({
+                ...form,
+                imageFile: e.target.files[0],
+                imageUrl: "",
+              })
+            }
+          />
+        </div>
 
         <div className="flex gap-4">
           <button
