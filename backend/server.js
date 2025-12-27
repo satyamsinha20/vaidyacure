@@ -4,6 +4,7 @@ require("dotenv").config();
 
 const connectDB = require("./config/db");
 const herbRoutes = require("./routes/herbRoutes");
+const homeopathyRoutes = require("./routes/homeopathyRoutes"); // ✅ new
 const authRoutes = require("./routes/authRoutes");
 
 const app = express();
@@ -13,6 +14,7 @@ app.use(express.json());
 
 // routes
 app.use("/api/herbs", herbRoutes);
+app.use("/api/homeopathy", homeopathyRoutes); // ✅ new
 app.use("/api/auth", authRoutes);
 
 // DB

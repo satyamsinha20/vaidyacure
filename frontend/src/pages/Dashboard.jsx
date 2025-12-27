@@ -27,6 +27,13 @@ export default function Dashboard({ user, setUser }) {
           Herbs
         </button>
 
+        <button
+          className="bg-teal-500 hover:bg-teal-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105"
+          onClick={() => navigate("/dashboard/homeopathy")}
+        >
+          Homeopathy
+        </button>
+
         <button className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition-transform transform hover:scale-105">
           Doctors
         </button>

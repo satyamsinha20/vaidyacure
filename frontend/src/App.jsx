@@ -4,6 +4,7 @@ import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Login from "./pages/Login";
 import Dashboard from "./pages/Dashboard";
 import Herbs from "./pages/Herbs";   // ✅ correct page
+import Homeopathy from "./pages/Homeopathy";
 
 function App() {
   const [user, setUser] = useState(
@@ -38,6 +39,11 @@ function App() {
         <Route
           path="/dashboard/herbs"
           element={user ? <Herbs /> : <Navigate to="/" />}
+        />
+        {/* Homeopathy Page */}
+        <Route
+          path="/dashboard/homeopathy"
+          element={user ? <Homeopathy /> : <Navigate to="/" />}
         />
 
       </Routes>
