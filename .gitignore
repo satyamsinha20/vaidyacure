@@ -1,0 +1,8 @@
+# Ignore backend secrets
+backend/.env
+
+# Ignore all env files (future safe)
+.env
+
+# Node modules
+node_modules/
