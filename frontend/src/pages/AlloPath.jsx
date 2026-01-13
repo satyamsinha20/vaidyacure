@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/axios";
-import AddAllopath from "./AddAlloPath"; // Note: filename casing must match
+import AddAllopath from "./AddAlloPath";
 import toast, { Toaster } from "react-hot-toast";
 
 const styles = {
   container: {
     minHeight: "100vh",
     background: "linear-gradient(to bottom right, #fff1f2, #ffe4e6)",
-    padding: "1.5rem",
+    padding: "1rem",
     fontFamily: "Arial, sans-serif",
   },
   button: {
@@ -18,15 +18,16 @@ const styles = {
     border: "none",
     cursor: "pointer",
     fontWeight: "bold",
+    whiteSpace: "nowrap",
   },
-  addButton: { backgroundColor: "#db2777" }, // pink
-  uploadButton: { backgroundColor: "#7e22ce" }, // purple
-  dashboardButton: { backgroundColor: "#4b5563" }, // gray
+  addButton: { backgroundColor: "#db2777" },
+  uploadButton: { backgroundColor: "#7e22ce" },
+  dashboardButton: { backgroundColor: "#4b5563" },
   tableContainer: {
     backgroundColor: "#fff",
     borderRadius: "1rem",
     boxShadow: "0 4px 6px rgba(0,0,0,0.1)",
-    overflow: "hidden",
+    overflowX: "auto", // ✅ mobile scroll
   },
   tableHeader: {
     backgroundColor: "#db2777",
@@ -36,6 +37,7 @@ const styles = {
   tableHeaderCell: {
     padding: "1rem",
     borderRight: "1px solid #f472b6",
+    minWidth: "150px",
   },
   row: {
     height: "5rem",
@@ -43,7 +45,11 @@ const styles = {
   },
   rowGray: { backgroundColor: "#e5e7eb" },
   rowPink: { backgroundColor: "#ffe4e6" },
-  cell: { padding: "1rem", borderRight: "1px solid #ccc" },
+  cell: {
+    padding: "1rem",
+    borderRight: "1px solid #ccc",
+    minWidth: "150px",
+  },
   image: { height: "4rem", width: "4rem", objectFit: "cover", borderRadius: "0.375rem" },
   actionButton: {
     padding: "0.25rem 0.75rem",
@@ -51,18 +57,17 @@ const styles = {
     border: "none",
     color: "#fff",
     cursor: "pointer",
-    marginRight: "0.5rem",
+    margin: "0.25rem",
     fontWeight: "bold",
   },
-  editButton: { backgroundColor: "#3b82f6" }, // blue
-  deleteButton: { backgroundColor: "#ef4444" }, // red
+  editButton: { backgroundColor: "#3b82f6" },
+  deleteButton: { backgroundColor: "#ef4444" },
   noData: { textAlign: "center", padding: "1.5rem", color: "#999" },
-  headerTitle: { fontSize: "1.5rem", fontWeight: "bold", color: "#be185d", padding: "1rem" },
+  headerTitle: { fontSize: "1.25rem", fontWeight: "bold", color: "#be185d", padding: "1rem" },
 };
 
 export default function Allopath() {
   const navigate = useNavigate();
-
   const [allopaths, setAllopaths] = useState([]);
   const [editData, setEditData] = useState(null);
   const [showForm, setShowForm] = useState(false);
@@ -71,8 +76,7 @@ export default function Allopath() {
     try {
       const res = await api.get("/allopath");
       setAllopaths(Array.isArray(res.data) ? res.data : []);
-    } catch (err) {
-      console.error("Failed to load allopaths", err);
+    } catch {
       toast.error("Failed to load medicines");
     }
   };
@@ -86,8 +90,7 @@ export default function Allopath() {
       await api.delete(`/allopath/${id}`);
       toast.success("Medicine deleted 💊");
       load();
-    } catch (err) {
-      console.error("Delete failed", err);
+    } catch {
       toast.error("Failed to delete medicine");
     }
   };
@@ -103,8 +106,7 @@ export default function Allopath() {
       link.click();
       link.remove();
       window.URL.revokeObjectURL(url);
-    } catch (err) {
-      console.error("Download failed", err);
+    } catch {
       toast.error("Failed to download medicines");
     }
   };
@@ -122,41 +124,30 @@ export default function Allopath() {
       });
       toast.success("Medicines uploaded successfully");
       load();
-    } catch (err) {
-      console.error("Bulk upload failed", err);
+    } catch {
       toast.error("Upload failed");
     }
-  };
-
-  const handleEdit = (item) => {
-    setEditData(item);
-    setShowForm(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
-  };
-
-  const handleAddNew = () => {
-    setEditData(null);
-    setShowForm(true);
-    window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
   return (
     <div style={styles.container}>
       <Toaster position="top-right" />
-      <div style={{ maxWidth: "1120px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "2.5rem" }}>
+
+      <div style={{ maxWidth: "1120px", margin: "0 auto", display: "flex", flexDirection: "column", gap: "2rem" }}>
         {/* Buttons */}
-        <div style={{ display: "flex", justifyContent: "flex-end", gap: "0.75rem" }}>
-          <button onClick={handleAddNew} style={{ ...styles.button, ...styles.addButton }}>
+        <div
+          style={{
+            display: "flex",
+            flexWrap: "wrap", // ✅ responsive
+            justifyContent: "flex-end",
+            gap: "0.75rem",
+          }}
+        >
+          <button onClick={() => setShowForm(true)} style={{ ...styles.button, ...styles.addButton }}>
             + Add New Medicine
           </button>
 
-          <input
-            type="file"
-            accept=".csv,.xlsx"
-            id="bulkUpload"
-            style={{ display: "none" }}
-            onChange={handleFileUpload}
-          />
+          <input type="file" accept=".csv,.xlsx" id="bulkUpload" hidden onChange={handleFileUpload} />
           <button onClick={() => document.getElementById("bulkUpload").click()} style={{ ...styles.button, ...styles.uploadButton }}>
             ⬆ Upload CSV / Excel
           </button>
@@ -170,26 +161,17 @@ export default function Allopath() {
           </button>
         </div>
 
-        {/* Add/Edit Form */}
+        {/* Form */}
         {showForm && (
-          <div style={{ backgroundColor: "#fff", borderRadius: "1rem", boxShadow: "0 4px 6px rgba(0,0,0,0.1)", padding: "1.5rem" }}>
-            <AddAllopath
-              refresh={load}
-              editData={editData}
-              setEditData={(data) => {
-                setEditData(data);
-                if (!data) setShowForm(false);
-              }}
-              setShowForm={setShowForm}
-            />
+          <div style={{ backgroundColor: "#fff", borderRadius: "1rem", padding: "1.5rem" }}>
+            <AddAllopath refresh={load} editData={editData} setEditData={setEditData} setShowForm={setShowForm} />
           </div>
         )}
 
         {/* Table */}
         <div style={styles.tableContainer}>
-          <div style={{ borderBottom: "1px solid #ccc" }}>
-            <h2 style={styles.headerTitle}>💊 Allopathy Management</h2>
-          </div>
+          <h2 style={styles.headerTitle}>💊 Allopathy Management</h2>
+
           <table style={{ width: "100%", borderCollapse: "collapse" }}>
             <thead style={styles.tableHeader}>
               <tr>
@@ -200,25 +182,15 @@ export default function Allopath() {
               </tr>
             </thead>
             <tbody>
-              {allopaths.map((m, index) => (
-                <tr
-                  key={m._id}
-                  style={{
-                    ...styles.row,
-                    ...(index % 2 === 0 ? styles.rowGray : styles.rowPink),
-                  }}
-                >
+              {allopaths.map((m, i) => (
+                <tr key={m._id} style={{ ...styles.row, ...(i % 2 ? styles.rowPink : styles.rowGray) }}>
                   <td style={styles.cell}>{m.name}</td>
                   <td style={styles.cell}>
-                    {m.imageUrl ? (
-                      <img src={m.imageUrl} alt={m.name} style={styles.image} />
-                    ) : (
-                      <span style={{ color: "#999" }}>No image</span>
-                    )}
+                    {m.imageUrl ? <img src={m.imageUrl} alt="" style={styles.image} /> : "No image"}
                   </td>
-                  <td style={styles.cell}>{Array.isArray(m.symptoms) ? m.symptoms.join(", ") : ""}</td>
-                  <td style={{ padding: "1rem", textAlign: "center" }}>
-                    <button onClick={() => handleEdit(m)} style={{ ...styles.actionButton, ...styles.editButton }}>
+                  <td style={styles.cell}>{m.symptoms?.join(", ")}</td>
+                  <td style={{ textAlign: "center" }}>
+                    <button onClick={() => setEditData(m)} style={{ ...styles.actionButton, ...styles.editButton }}>
                       Edit
                     </button>
                     <button onClick={() => del(m._id)} style={{ ...styles.actionButton, ...styles.deleteButton }}>

@@ -49,7 +49,6 @@ export default function AddHomeopathy({ refresh, editData, setEditData, setShowF
 
   const submit = async (e) => {
     e.preventDefault();
-
     try {
       const formData = new FormData();
       Object.keys(form).forEach((key) => {
@@ -78,7 +77,7 @@ export default function AddHomeopathy({ refresh, editData, setEditData, setShowF
       resetForm();
       setShowForm(false);
     } catch (err) {
-      console.error("Error saving remedy:", err);
+      console.error(err);
       toast.error("Failed to save remedy ❌");
     }
   };
@@ -90,15 +89,17 @@ export default function AddHomeopathy({ refresh, editData, setEditData, setShowF
   };
 
   return (
-    <div className="bg-white shadow-xl rounded-xl p-6">
-      <h2 className="text-2xl font-bold mb-4 text-teal-700">{editData ? "Edit Remedy" : "Add New Remedy"}</h2>
+    <div className="bg-white shadow-xl rounded-xl p-4 sm:p-6 max-w-4xl mx-auto">
+      <h2 className="text-xl sm:text-2xl font-bold mb-4 text-teal-700 text-center sm:text-left">
+        {editData ? "Edit Remedy" : "Add New Remedy"}
+      </h2>
+
       <form onSubmit={submit} className="space-y-4">
         {/* Name */}
         <div>
           <label className="block text-sm font-semibold mb-1">Name</label>
           <input
             className="w-full border rounded-lg p-2"
-            placeholder="Enter remedy name"
             value={form.name}
             onChange={(e) => setForm({ ...form, name: e.target.value })}
             required
@@ -110,66 +111,58 @@ export default function AddHomeopathy({ refresh, editData, setEditData, setShowF
           <label className="block text-sm font-semibold mb-1">Description</label>
           <textarea
             className="w-full border rounded-lg p-2 h-24"
-            placeholder="Enter description"
             value={form.description}
             onChange={(e) => setForm({ ...form, description: e.target.value })}
             required
           />
         </div>
 
-        {/* Benefits */}
-        <div>
-          <label className="block text-sm font-semibold mb-1">Benefits (comma separated)</label>
-          <input
-            className="w-full border rounded-lg p-2"
-            placeholder="Digestion, Immunity"
-            value={form.benefit}
-            onChange={(e) => setForm({ ...form, benefit: e.target.value })}
-          />
-        </div>
+        {/* Grid fields */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label className="block text-sm font-semibold mb-1">Benefits</label>
+            <input
+              className="w-full border rounded-lg p-2"
+              value={form.benefit}
+              onChange={(e) => setForm({ ...form, benefit: e.target.value })}
+            />
+          </div>
 
-        {/* Side Effects */}
-        <div>
-          <label className="block text-sm font-semibold mb-1">Side Effects</label>
-          <input
-            className="w-full border rounded-lg p-2"
-            placeholder="Nausea, Allergy"
-            value={form.sideEffect}
-            onChange={(e) => setForm({ ...form, sideEffect: e.target.value })}
-          />
-        </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Side Effects</label>
+            <input
+              className="w-full border rounded-lg p-2"
+              value={form.sideEffect}
+              onChange={(e) => setForm({ ...form, sideEffect: e.target.value })}
+            />
+          </div>
 
-        {/* Health */}
-        <div>
-          <label className="block text-sm font-semibold mb-1">Health Category</label>
-          <input
-            className="w-full border rounded-lg p-2"
-            placeholder="Digestive, Skin"
-            value={form.health}
-            onChange={(e) => setForm({ ...form, health: e.target.value })}
-          />
-        </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Health</label>
+            <input
+              className="w-full border rounded-lg p-2"
+              value={form.health}
+              onChange={(e) => setForm({ ...form, health: e.target.value })}
+            />
+          </div>
 
-        {/* Symptoms */}
-        <div>
-          <label className="block text-sm font-semibold mb-1">Symptoms</label>
-          <input
-            className="w-full border rounded-lg p-2"
-            placeholder="Cough, Fever"
-            value={form.symptoms}
-            onChange={(e) => setForm({ ...form, symptoms: e.target.value })}
-          />
-        </div>
+          <div>
+            <label className="block text-sm font-semibold mb-1">Symptoms</label>
+            <input
+              className="w-full border rounded-lg p-2"
+              value={form.symptoms}
+              onChange={(e) => setForm({ ...form, symptoms: e.target.value })}
+            />
+          </div>
 
-        {/* Potency */}
-        <div>
-          <label className="block text-sm font-semibold mb-1">Potency</label>
-          <input
-            className="w-full border rounded-lg p-2"
-            placeholder="30C, 200C, 1M"
-            value={form.potency}
-            onChange={(e) => setForm({ ...form, potency: e.target.value })}
-          />
+          <div>
+            <label className="block text-sm font-semibold mb-1">Potency</label>
+            <input
+              className="w-full border rounded-lg p-2"
+              value={form.potency}
+              onChange={(e) => setForm({ ...form, potency: e.target.value })}
+            />
+          </div>
         </div>
 
         {/* Process */}
@@ -177,7 +170,6 @@ export default function AddHomeopathy({ refresh, editData, setEditData, setShowF
           <label className="block text-sm font-semibold mb-1">Preparation / Usage</label>
           <textarea
             className="w-full border rounded-lg p-2 h-24"
-            placeholder="Each step on new line"
             value={form.process}
             onChange={(e) => setForm({ ...form, process: e.target.value })}
           />
@@ -185,26 +177,42 @@ export default function AddHomeopathy({ refresh, editData, setEditData, setShowF
 
         {/* Image */}
         {form.imageUrl && !form.imageFile && (
-          <div>
-            <label className="block text-sm font-semibold mb-1">Current Image</label>
-            <img src={form.imageUrl} alt="Remedy" className="h-32 w-32 object-cover rounded-md" />
+          <div className="flex flex-col sm:flex-row gap-3 items-start">
+            <label className="text-sm font-semibold">Current Image</label>
+            <img
+              src={form.imageUrl}
+              alt="Remedy"
+              className="h-28 w-28 object-cover rounded-md"
+            />
           </div>
         )}
 
+        {/* Upload */}
         <div>
           <label className="block text-sm font-semibold mb-1">Upload Image</label>
           <input
             type="file"
             accept="image/*"
-            onChange={(e) => setForm({ ...form, imageFile: e.target.files[0], imageUrl: "" })}
+            onChange={(e) =>
+              setForm({ ...form, imageFile: e.target.files[0], imageUrl: "" })
+            }
           />
         </div>
 
-        <div className="flex gap-4">
-          <button type="submit" className="bg-teal-600 text-white px-6 py-2 rounded-lg">
+        {/* Buttons */}
+        <div className="flex flex-col sm:flex-row gap-3 pt-2">
+          <button
+            type="submit"
+            className="bg-teal-600 text-white px-6 py-2 rounded-lg w-full sm:w-auto"
+          >
             {editData ? "Update Remedy" : "Save Remedy"}
           </button>
-          <button type="button" onClick={handleCancel} className="bg-gray-400 text-white px-6 py-2 rounded-lg">
+
+          <button
+            type="button"
+            onClick={handleCancel}
+            className="bg-gray-400 text-white px-6 py-2 rounded-lg w-full sm:w-auto"
+          >
             Cancel
           </button>
         </div>
